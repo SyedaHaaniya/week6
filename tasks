@@ -1,0 +1,95 @@
+import datetime
+
+# Constants for ticket prices
+TICKET_PRICES_ONE_DAY = {
+    "adult": 20.00,
+    "child": 12.00,
+    "senior": 16.00,
+    "family": 60.00,
+    "group": 15.00
+}
+TICKET_PRICES_TWO_DAYS = {
+    "adult": 30.00,
+    "child": 18.00,
+    "senior": 24.00,
+    "family": 90.00,
+    "group": 22.50
+}
+# Constants for extra attraction prices
+EXTRA_ATTRACTION_PRICES = {
+    "lion feeding": 2.50,
+    "penguin feeding": 2.00,
+    "evening barbecue": 5.00
+}
+def display_ticket_options():
+    print("Ticket options for one-day visit:")
+    for ticket_type, price in TICKET_PRICES_ONE_DAY.items():
+        print(f"{ticket_type.capitalize()}: ${price}")
+
+    print("\nTicket options for two-day visit:")
+    for ticket_type, price in TICKET_PRICES_TWO_DAYS.items():
+        print(f"{ticket_type.capitalize()}: ${price}")
+
+    print("\nExtra attractions:")
+    for attraction, price in EXTRA_ATTRACTION_PRICES.items():
+        print(f"{attraction.capitalize()}: ${price}")
+
+def get_booking_dates():
+    print("Enter the dates for your visit (YYYY-MM-DD format):")
+    start_date_input = input("Start date: ")
+    end_date_input = input("End date: ")
+    try:
+        start_date = datetime.datetime.strptime(start_date_input, "%Y-%m-%d")
+        end_date = datetime.datetime.strptime(end_date_input, "%Y-%m-%d")
+        if start_date > end_date:
+            raise ValueError("End date must be after start date.")
+    except ValueError as e:
+        print(f"Error: {e}")
+        return get_booking_dates()
+
+    return start_date, end_date
+def calculate_total_cost(ticket_type_counts, extra_attraction_counts, duration):
+    total_cost = 0
+    for ticket_type, count in ticket_type_counts.items():
+        if duration == 1:
+            total_cost += count * TICKET_PRICES_ONE_DAY[ticket_type]
+        else:
+            total_cost += count * TICKET_PRICES_TWO_DAYS[ticket_type]
+
+    for attraction, count in extra_attraction_counts.items():
+        total_cost += count * EXTRA_ATTRACTION_PRICES[attraction]
+
+    return total_cost
+def process_booking():
+    print("\nProcessing booking...")
+    ticket_type_counts = {}
+    extra_attraction_counts = {}
+
+    while True:
+        ticket_type = input("Enter ticket type (adult/child/senior/family/group) or type 'done' to finish: ").lower()
+        if ticket_type == 'done':
+            break
+        if ticket_type not in TICKET_PRICES_ONE_DAY:
+            print("Invalid ticket type. Please enter a valid ticket type.")
+            continue
+        count = int(input("Enter quantity: "))
+        ticket_type_counts[ticket_type] = ticket_type_counts.get(ticket_type, 0) + count
+    while True:
+        attraction = input("Enter extra attraction (lion feeding/penguin feeding/evening barbecue) or type 'done' to finish: ").lower()
+        if attraction == 'done':
+            break
+        if attraction not in EXTRA_ATTRACTION_PRICES:
+            print("Invalid attraction. Please enter a valid attraction.")
+            continue
+        count = int(input("Enter quantity: "))
+        extra_attraction_counts[attraction] = extra_attraction_counts.get(attraction, 0) + count
+    duration = 2 if len(ticket_type_counts) > 0 and 'group' in ticket_type_counts else 1
+    total_cost = calculate_total_cost(ticket_type_counts, extra_attraction_counts, duration)
+    booking_number = hash((datetime.datetime.now(), tuple(ticket_type_counts.items()), tuple(extra_attraction_counts.items())))
+    print("\nBooking details:")
+    print(f"Total cost: ${total_cost}")
+    print(f"Booking number: {booking_number}")
+# Task 1 - Display ticket options and extra attractions
+display_ticket_options()
+# Task 2 - Process a booking
+process_booking()
